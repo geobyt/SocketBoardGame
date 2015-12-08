@@ -1,0 +1,112 @@
+/* ******************************
+          Game Area
+   ****************************** */
+
+#gameArea {
+    height: 100%;
+    width: 100%;
+}
+
+.title {
+    margin: 0px auto;
+    text-align: center;
+    width: 100%;
+    font-size: 38px;
+    color: green;
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+}
+
+/* ******************************
+          Board Area
+   ****************************** */
+
+#boardArea {
+    position: relative;
+}
+
+.col.letter-tile {
+    border: 1px solid #eee;
+    text-align: center;
+    font-size: 38px;
+    background-color: green;
+    color: white;
+    padding-top:25%;
+    position: relative;
+}
+
+.col.letter-tile.selected {
+    background-color: tomato;
+}
+
+.col.letter-tile.unselected {
+    background-color: green;
+}
+
+.content {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    padding: 20px;
+    text-align: center;
+    vertical-align: middle;
+    width: 100%;
+}
+
+/* ******************************
+          Player Scores
+   ****************************** */
+
+#playerScores {
+    height: 10%;
+    width: 100%;
+    position: relative;
+    top: 0;
+}
+
+.playerScore {
+    width: 50%;
+    padding: 0;
+    margin: 0;
+    font-weight: 400;
+    height: 100%;
+}
+
+.playerScore span {
+    display: inline-block;
+    font-size: 1.4EM;
+    padding: 2%;
+    min-width: 10%;
+    margin: 0;
+}
+
+.playerScore .score {
+    text-align: center;
+    background-color: green;
+}
+
+.playerScore .playerName {
+    width: 77%;
+    background-color: tomato;
+}
+
+#player1Score {
+    float: left;
+}
+
+#player2Score {
+    float: right;
+    text-align: right;
+}
+
+/* ******************************
+          Other stuff
+   ****************************** */
+
