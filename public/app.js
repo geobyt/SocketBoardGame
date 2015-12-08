@@ -196,11 +196,12 @@ jQuery(function($){
          * *********************************** */
 
         /**
-         * Show the initial Anagrammatix Title Screen
+         * Show the initial Letter Loot Title Screen
          * (with Start and Join buttons)
          */
         showInitScreen: function() {
             App.$gameArea.html(App.$templateIntroScreen);
+            IO.socket.emit('hostListJoinableGames');
             //App.doTextFit('.title');
         },
 

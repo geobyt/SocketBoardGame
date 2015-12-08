@@ -21,19 +21,31 @@
             <div class="col s12 m8 l6 offset-m2 offset-l3">
                 <div class="card-panel large z-depth-2">
                     <div class="row">
-                        <div class="title">BOARD GAME</div>
+                        <div class="title">Letter Loot</div>
                     </div>
                     <div class="row">
-                        <div class="col s5 m4 l3 offset-s1 offset-m2 offset-l3">
-                            <a class="waves-effect waves-light btn-large left" id="btnCreateGame">CREATE</a>
-                        </div>
-                        <div class="col s5 m4 l3">
-                            <a class="waves-effect waves-light btn-large right" id="btnJoinGame">JOIN</a>
-                        </div>
+                        <form>
+                            <div class="col s5 m5 l5 offset-s1 offset-m2 offset-l3 input-field">
+                                <input id="inputPlayerName" type="text" class="validate">
+                                <label for="inputPlayerName">Your name</label>
+                            </div>
+                            <div class="col s1 m1 l1">
+                                <a class="waves-effect waves-light btn-large left" id="btnCreateGame">CREATE</a>
+                            </div>
+                        </form>
                     </div>
                 </div>
+                <ul id="game-room-list" class="collection">
+                </ul>
             </div>
         </div>
+    </script>
+
+    <script id="game-room-row-template" type="text/template">
+        <li class="game-room-row collection-item">
+            <span class="player-name"></span>
+            <a class="waves-effect waves-light btn-large left" id="btnCreateGame">JOIN</a>
+        </li>
     </script>
 
     <!-- This screen appears when a user clicks "CREATE" on the Title Screen -->

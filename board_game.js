@@ -17,6 +17,7 @@ exports.initGame = function(sio, socket){
     gameSocket.on('hostRoomFull', hostPrepareGame);
     gameSocket.on('hostCountdownFinished', hostStartGame);
     gameSocket.on('hostNextRound', hostNextRound);
+    gameSocket.on('hostListJoinableGames', hostListJoinableGames);
 
     // Player Events
     gameSocket.on('playerJoinGame', playerJoinGame);
@@ -104,6 +105,19 @@ function hostNextRound(data) {
         io.sockets.in(data.gameId).emit('gameOver',data);
     }
 }
+/**
+ * Host list all the games with only one user 
+ */
+function hostListJoinableGames() {
+    //console.log('Player ' + data.playerName + 'attempting to join game: ' + data.gameId );
+
+    // A reference to the player's Socket.IO socket object
+    var sock = this;
+
+    // Look up the room ID in the Socket.IO manager object.
+    var room = gameSocket.manager.rooms;
+}
+
 /* *****************************
    *                           *
    *     PLAYER FUNCTIONS      *

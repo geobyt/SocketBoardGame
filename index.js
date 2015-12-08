@@ -11,7 +11,7 @@ var path = require('path');
 // Create a new instance of Express
 var app = express();
 
-// Import the Anagrammatix game file.
+// Import the Letter Loot game file.
 var agx = require('./board_game');
 
 app.use(require('connect-livereload')());
