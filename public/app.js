@@ -24,7 +24,7 @@ jQuery(function($){
             IO.socket.on('beginNewGame', IO.beginNewGame );
             IO.socket.on('newWordData', IO.onNewWordData);
             IO.socket.on('newBoardData', IO.onNewBoardData);
-            IO.socket.on('hostCheckAnswer', IO.hostCheckAnswer);
+            IO.socket.on('checkAnswer', IO.checkAnswer);
             IO.socket.on('gameOver', IO.gameOver);
             IO.socket.on('error', IO.error );
         },
@@ -93,10 +93,8 @@ jQuery(function($){
          * A player answered. If this is the host, check the answer.
          * @param data
          */
-        hostCheckAnswer : function(data) {
-            if(App.myRole === 'Host') {
-                App.Host.checkAnswer(data);
-            }
+        checkAnswer : function(data) {
+            App[App.myRole].checkAnswer(data);
         },
 
         /**
@@ -155,9 +153,6 @@ jQuery(function($){
             App.cacheElements();
             App.showInitScreen();
             App.bindEvents();
-
-            // Initialize the fastclick library
-            FastClick.attach(document.body);
         },
 
         /**
@@ -374,14 +369,7 @@ jQuery(function($){
              * @param data{{round: *, playerId: *, answer: *, gameId: *}}
              */
             checkAnswer : function(data) {
-                // Verify that the answer clicked is from the current round.
-                // This prevents a 'late entry' from a player whos screen has not
-                // yet updated to the current round.
-
-                // Get the player's score
                 var $pScore = $('#' + data.playerId);
-
-                //alert("checkAnswer called for " + data.playerId + " with score " + $pScore.text() + ". word exists? " + data.wordExists);
 
                 if (data.wordExists) {
                    $pScore.text(+$pScore.text() + 5);
@@ -389,28 +377,6 @@ jQuery(function($){
                 else {
                     $pScore.text(+$pScore.text() - 3);
                 }
-
-                /*// Advance player's score if it is correct
-                if( App.Host.currentCorrectAnswer === data.answer ) {
-                    // Add 5 to the player's score
-                    $pScore.text( +$pScore.text() + 5 );
-
-                    // Advance the round
-                    App.currentRound += 1;
-
-                    // Prepare data to send to the server
-                    var data = {
-                        gameId : App.gameId,
-                        round : App.currentRound
-                    }
-
-                    // Notify the server to start the next round.
-                    IO.socket.emit('hostNextRound',data);
-
-                } else {
-                    // A wrong answer was submitted, so decrement the player's score.
-                    $pScore.text( +$pScore.text() - 3 );
-                }*/
             },
 
 
@@ -611,6 +577,15 @@ jQuery(function($){
 
                 // Insert the list onto the screen.
                 $('#gameArea').html($list);
+            },
+
+            checkAnswer : function(data) {
+                if (data.wordExists) {
+                    Materialize.toast('YAY', 1000);
+                }
+                else {
+                    Materialize.toast('NAY', 1000);
+                }
             },
 
             newTiles : function(data) {

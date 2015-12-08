@@ -154,7 +154,7 @@ function playerAnswer(data) {
     //check the word
     data.wordExists = dictionaryTrie.contains(data.answer);
 
-    io.sockets.in(data.gameId).emit('hostCheckAnswer', data);
+    io.sockets.in(data.gameId).emit('checkAnswer', data);
 }
 
 /**
