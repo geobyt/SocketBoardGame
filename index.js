@@ -1,3 +1,7 @@
+livereload = require('livereload');
+server = livereload.createServer();
+server.watch(__dirname);
+
 // Import the Express module
 var express = require('express');
 
@@ -9,6 +13,8 @@ var app = express();
 
 // Import the Anagrammatix game file.
 var agx = require('./board_game');
+
+app.use(require('connect-livereload')());
 
 // Create a simple Express application
 app.configure(function() {
