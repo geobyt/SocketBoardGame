@@ -22,10 +22,8 @@ jQuery(function($){
             IO.socket.on('newGameCreated', IO.onNewGameCreated );
             IO.socket.on('playerJoinedRoom', IO.playerJoinedRoom );
             IO.socket.on('beginNewGame', IO.beginNewGame );
-            IO.socket.on('newWordData', IO.onNewWordData);
             IO.socket.on('newBoardData', IO.onNewBoardData);
             IO.socket.on('checkAnswer', IO.checkAnswer);
-            IO.socket.on('gameOver', IO.gameOver);
             IO.socket.on('error', IO.error );
         },
 
@@ -68,18 +66,6 @@ jQuery(function($){
             App[App.myRole].gameCountdown(data);
         },
 
-        /**
-         * A new set of words for the round is returned from the server.
-         * @param data
-         */
-        onNewWordData : function(data) {
-            // Update the current round
-            App.currentRound = data.round;
-
-            // Change the word for the Host and Player
-            App[App.myRole].newWord(data);
-        },
-
         onNewBoardData : function(data) {
             if (App.myRole === 'Player') {
                 App.Player.newBoard(data);
@@ -95,14 +81,6 @@ jQuery(function($){
          */
         checkAnswer : function(data) {
             App[App.myRole].checkAnswer(data);
-        },
-
-        /**
-         * Let everyone know the game has ended.
-         * @param data
-         */
-        gameOver : function(data) {
-            App[App.myRole].endGame(data);
         },
 
         /**
@@ -182,7 +160,6 @@ jQuery(function($){
             App.$doc.on('click', '#btnJoinGame', App.Player.onJoinClick);
             App.$doc.on('click', '#btnStart',App.Player.onPlayerStartClick);
             App.$doc.on('click', '.content',App.Player.onPlayerTileClick);
-            App.$doc.on('click', '#btnPlayerRestart', App.Player.onPlayerRestart);
             App.$doc.on('click', '#btnSolveWord', App.Player.onPlayerSolveClick);
         },
 
@@ -196,7 +173,6 @@ jQuery(function($){
          */
         showInitScreen: function() {
             App.$gameArea.html(App.$templateIntroScreen);
-            //App.doTextFit('.title');
         },
 
 
@@ -246,7 +222,6 @@ jQuery(function($){
                 App.Host.numPlayersInRoom = 0;
 
                 App.Host.displayNewGameScreen();
-                // console.log("Game started with ID: " + App.gameId + ' by host: ' + App.mySocketId);
             },
 
             /**
@@ -258,7 +233,6 @@ jQuery(function($){
 
                 // Display the URL on screen
                 $('#gameURL').text(window.location.href);
-                //App.doTextFit('#gameURL');
 
                 // Show the gameId / room id on screen
                 $('#spanNewGameCode').text(App.gameId);
@@ -307,24 +281,6 @@ jQuery(function($){
                 App.countDown( $secondsLeft, 5, function(){
                     IO.socket.emit('hostCountdownFinished', App.gameId);
                 });
-                //App.$gameArea.html(App.$hostGameInProgress);
-
-                /*alert(App.Host.players[0].playerName + " " + App.Host.players[1].playerName);
-
-                // Display the players' names on screen
-                $('#player1Score')
-                    .find('.playerName')
-                    .html(App.Host.players[0].playerName);
-
-                $('#player2Score')
-                    .find('.playerName')
-                    .html(App.Host.players[1].playerName);
-
-                alert($('#player1Score').find('.playerName').html() + " " + $('#player2Score').find('.playerName').html());
-
-                // Set the Score section on screen to 0 for each player.
-                $('#player1Score').find('.score').attr('id',App.Host.players[0].mySocketId);
-                $('#player2Score').find('.score').attr('id',App.Host.players[1].mySocketId);*/
             },
 
             newBoard: function(data) {
@@ -351,20 +307,6 @@ jQuery(function($){
             },
 
             /**
-             * Show the word for the current round on screen.
-             * @param data{{round: *, word: *, answer: *, list: Array}}
-             */
-            newWord : function(data) {
-                // Insert the new word into the DOM
-                $('#hostWord').text(data.word);
-                //App.doTextFit('#hostWord');
-
-                // Update the data for the current round
-                App.Host.currentCorrectAnswer = data.answer;
-                App.Host.currentRound = data.round;
-            },
-
-            /**
              * Check the answer clicked by a player.
              * @param data{{round: *, playerId: *, answer: *, gameId: *}}
              */
@@ -378,47 +320,6 @@ jQuery(function($){
                     $pScore.text(+$pScore.text() - 3);
                 }
             },
-
-
-            /**
-             * All 10 rounds have played out. End the game.
-             * @param data
-             */
-            endGame : function(data) {
-                // Get the data for player 1 from the host screen
-                var $p1 = $('#player1Score');
-                var p1Score = +$p1.find('.score').text();
-                var p1Name = $p1.find('.playerName').text();
-
-                // Get the data for player 2 from the host screen
-                var $p2 = $('#player2Score');
-                var p2Score = +$p2.find('.score').text();
-                var p2Name = $p2.find('.playerName').text();
-
-                // Find the winner based on the scores
-                var winner = (p1Score < p2Score) ? p2Name : p1Name;
-                var tie = (p1Score === p2Score);
-
-                // Display the winner (or tie game message)
-                if(tie){
-                    $('#hostWord').text("It's a Tie!");
-                } else {
-                    $('#hostWord').text( winner + ' Wins!!' );
-                }
-                //App.doTextFit('#hostWord');
-
-                // Reset game data
-                App.Host.numPlayersInRoom = 0;
-                App.Host.isNewGame = true;
-            },
-
-            /**
-             * A player hit the 'Start Again' button after the end of a game.
-             */
-            restartGame : function() {
-                App.$gameArea.html(App.$templateNewGame);
-                $('#spanNewGameCode').text(App.gameId);
-            }
         },
 
 
@@ -485,20 +386,6 @@ jQuery(function($){
             },
 
             /**
-             *  Click handler for the "Start Again" button that appears
-             *  when a game is over.
-             */
-            onPlayerRestart : function() {
-                var data = {
-                    gameId : App.gameId,
-                    playerName : App.Player.myName
-                }
-                IO.socket.emit('playerRestart',data);
-                App.currentRound = 0;
-                $('#gameArea').html("<h3>Waiting on host to start new game.</h3>");
-            },
-
-            /**
              * Display the waiting screen for player 1
              * @param data
              */
@@ -553,32 +440,6 @@ jQuery(function($){
                 }
             },
 
-            /**
-             * Show the list of words for the current round.
-             * @param data{{round: *, word: *, answer: *, list: Array}}
-             */
-            newWord : function(data) {
-                // Create an unordered list element
-                var $list = $('<ul/>').attr('id','ulAnswers');
-
-                // Insert a list item for each word in the word list
-                // received from the server.
-                $.each(data.list, function(){
-                    $list                                //  <ul> </ul>
-                        .append( $('<li/>')              //  <ul> <li> </li> </ul>
-                            .append( $('<button/>')      //  <ul> <li> <button> </button> </li> </ul>
-                                .addClass('btnAnswer')   //  <ul> <li> <button class='btnAnswer'> </button> </li> </ul>
-                                .addClass('btn')         //  <ul> <li> <button class='btnAnswer'> </button> </li> </ul>
-                                .val(this)               //  <ul> <li> <button class='btnAnswer' value='word'> </button> </li> </ul>
-                                .html(this)              //  <ul> <li> <button class='btnAnswer' value='word'>word</button> </li> </ul>
-                            )
-                        )
-                });
-
-                // Insert the list onto the screen.
-                $('#gameArea').html($list);
-            },
-
             checkAnswer : function(data) {
                 if (data.wordExists) {
                     Materialize.toast('YAY', 1000);
@@ -590,21 +451,6 @@ jQuery(function($){
 
             newTiles : function(data) {
                 App.$gameArea.html(App.$playerGameInProgress);
-            },
-
-            /**
-             * Show the "Game Over" screen.
-             */
-            endGame : function() {
-                $('#gameArea')
-                    .html('<div class="gameOver">Game Over!</div>')
-                    .append(
-                        // Create a button to start a new game.
-                        $('<button>Start Again</button>')
-                            .attr('id','btnPlayerRestart')
-                            .addClass('btn')
-                            .addClass('btnGameOver')
-                    );
             }
         },
 
@@ -648,25 +494,6 @@ jQuery(function($){
             }
 
         },
-
-        /**
-         * Make the text inside the given element as big as possible
-         * See: https://github.com/STRML/textFit
-         *
-         * @param el The parent element of some text
-         */
-        /*doTextFit : function(el) {
-            textFit(
-                $(el)[0],
-                {
-                    alignHoriz:true,
-                    alignVert:false,
-                    widthOnly:true,
-                    reProcess:true,
-                    maxFontSize:300
-                }
-            );
-        }*/
 
     };
 
