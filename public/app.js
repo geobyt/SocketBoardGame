@@ -509,22 +509,13 @@ jQuery(function($){
              *  Click handler for the Player hitting a word in the word list.
              */
             onPlayerTileClick: function() {
-                var $btn = $(this);      // the tapped button
-                var answer = $btn.val(); // The tapped word
+                var $btn = $(this);
+                var answer = $btn.val();
 
-                App.Player.currentWord += answer;
-
-                //alert("clicked tile: " + answer);
-
-                // Send the player info and tapped word to the server so
-                // the host can check the answer.
-                /*var data = {
-                    gameId: App.gameId,
-                    playerId: App.mySocketId,
-                    answer: answer,
-                    round: App.currentRound
+                if (!$btn.parent().hasClass("selected")) {
+                    $btn.parent().addClass("selected");
+                    App.Player.currentWord += answer;
                 }
-                IO.socket.emit('playerAnswer',data);*/
             },
 
             /**
@@ -589,6 +580,11 @@ jQuery(function($){
                 IO.socket.emit('playerAnswer',data);
 
                 App.Player.currentWord = '';
+                for(var i = 0; i < 4; i++) {
+                    for(var j = 0; j < 4; j++) {
+                        $('#square_' + i + "_" + j).parent().removeClass("selected");
+                    }
+                }
             },
 
             /**
