@@ -7,5 +7,9 @@
     "express": "3.x",
     "socket.io": "0.9"
   },
-  "main": "index.js"
+  "main": "index.js",
+  "devDependencies": {
+    "connect-livereload": "^0.5.4",
+    "livereload": "^0.4.0"
+  }
 }
