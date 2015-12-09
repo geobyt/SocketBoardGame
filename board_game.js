@@ -1,5 +1,6 @@
 var io;
 var gameSocket;
+var roomData = {};
 
 /**
  * This function is called by index.js to initialize a new game instance.
@@ -54,15 +55,20 @@ function loadDictionary() {
 /**
  * The 'START' button was clicked and 'hostCreateNewGame' event occurred.
  */
-function hostCreateNewGame() {
+
+function hostCreateNewGame(data) {
     // Create a unique Socket.IO Room
     var thisGameId = ( Math.random() * 100000 ) | 0;
 
     // Return the Room ID (gameId) and the socket ID (mySocketId) to the browser client
     this.emit('newGameCreated', {gameId: thisGameId, mySocketId: this.id});
 
+    var roomId = '/' + thisGameId.toString();
+
     // Join the Room and wait for the players
-    this.join(thisGameId.toString());
+    this.join(roomId);
+    
+    roomData[roomId] = {players: [{playerName: data.playerName, mySocketId: this.id}], gameId: thisGameId};
 
     loadDictionary();
 };
@@ -98,9 +104,7 @@ function hostListJoinableGames() {
 
     // A reference to the player's Socket.IO socket object
     var sock = this;
-
-    // Look up the room ID in the Socket.IO manager object.
-    var room = gameSocket.manager.rooms;
+    sock.emit('didGetJoinableRooms', roomData);
 }
 
 /* *****************************
@@ -121,8 +125,10 @@ function playerJoinGame(data) {
     // A reference to the player's Socket.IO socket object
     var sock = this;
 
+    var roomId = "/" + data.gameId;
+
     // Look up the room ID in the Socket.IO manager object.
-    var room = gameSocket.manager.rooms["/" + data.gameId];
+    var room = gameSocket.manager.rooms[roomId];
 
     // If the room exists...
     if( room != undefined ){
@@ -136,6 +142,8 @@ function playerJoinGame(data) {
 
         // Emit an event notifying the clients that the player has joined the room.
         io.sockets.in(data.gameId).emit('playerJoinedRoom', data);
+        
+        roomData[roomId] = {players: [{playerName: data.playerName, mySocketId: sock.id}], gameId: data.gameId};
 
     } else {
         // Otherwise, send an error message back to the player.

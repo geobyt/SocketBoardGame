@@ -21,10 +21,20 @@ jQuery(function($){
             IO.socket.on('connected', IO.onConnected );
             IO.socket.on('newGameCreated', IO.onNewGameCreated );
             IO.socket.on('playerJoinedRoom', IO.playerJoinedRoom );
+            IO.socket.on('didGetJoinableRooms', IO.didGetJoinableRooms);
             IO.socket.on('beginNewGame', IO.beginNewGame );
             IO.socket.on('newBoardData', IO.onNewBoardData);
             IO.socket.on('checkAnswer', IO.checkAnswer);
             IO.socket.on('error', IO.error );
+        },
+
+        didGetJoinableRooms: function(data) {
+            var rowTemplate = _.template(App.$gameRoomRow);
+            $('#game-room-list').html("");
+            Object.keys(data).forEach(function(roomId) {
+                var room = data[roomId];
+                $('#game-room-list').append(rowTemplate(room));                
+            });
         },
 
         /**
@@ -147,6 +157,7 @@ jQuery(function($){
             App.$hostGameCountdown = $('#host-game-countdown-template').html();
             App.$hostGameInProgress = $('#host-game-in-progress-template').html();
             App.$playerGameInProgress = $('#player-game-in-progress-template').html();
+            App.$gameRoomRow = $('#game-room-row-template').html();
         },
 
         /**
@@ -209,7 +220,12 @@ jQuery(function($){
              */
             onCreateClick: function () {
                 console.log('Clicked "Create A Game"');
-                IO.socket.emit('hostCreateNewGame');
+
+                var data = {
+                    playerName : $('#inputPlayerName').val() || 'anon'
+                };
+                
+                IO.socket.emit('hostCreateNewGame', data);
             },
 
             /**
@@ -231,12 +247,6 @@ jQuery(function($){
             displayNewGameScreen : function() {
                 // Fill the game screen with the appropriate HTML
                 App.$gameArea.html(App.$templateNewGame);
-
-                // Display the URL on screen
-                $('#gameURL').text(window.location.href);
-
-                // Show the gameId / room id on screen
-                $('#spanNewGameCode').text(App.gameId);
             },
 
             /**
